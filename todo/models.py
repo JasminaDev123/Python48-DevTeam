@@ -20,3 +20,6 @@ class UserProfile(AbstractUser):
     status = models.CharField(max_length=10, choises=USER_STATUS, default='beginner')
     data_register = models.DateField(auto_now_add=True)
 
+
+class Category(models.Model):
+    category_name = models.CharField()
