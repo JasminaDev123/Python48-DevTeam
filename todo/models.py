@@ -22,4 +22,5 @@ class UserProfile(AbstractUser):
 
 
 class Category(models.Model):
-    category_name = models.CharField()
+    category_name = models.CharField(max_length=50, unique=True)
+    category_img = models.ImageField(upload_to='UserImage', null=True, blank=True)
