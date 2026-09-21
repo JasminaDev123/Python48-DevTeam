@@ -24,3 +24,31 @@ class UserProfile(AbstractUser):
 class Category(models.Model):
     category_name = models.CharField(max_length=50, unique=True)
     category_img = models.ImageField(upload_to='UserImage', null=True, blank=True)
+
+
+class Project(models.Model):
+    project_name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='projects')
+    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='owner')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    def get_tasks_count(self):
+        return self.tasks.count()
+
+    def get_completed_percent(self):
+        total = self.tasks.count()
+
+        if total == 0:
+            return 0
+
+        completed = self.tasks.filter(status='completed').count()
+
+        return (completed / total) * 100
+
+
+class Tag(models.Model):
+    tag_name = models.CharField(30, unique=True)
+
+
