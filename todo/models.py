@@ -21,10 +21,16 @@ class UserProfile(AbstractUser):
     status = models.CharField(max_length=10, choises=USER_STATUS, default='beginner')
     data_register = models.DateField(auto_now_add=True)
 
+    def __str__(self):
+        return self.username
+
 
 class Category(models.Model):
     category_name = models.CharField(max_length=50, unique=True)
     category_img = models.ImageField(upload_to='UserImage', null=True, blank=True)
+
+    def __str__(self):
+        return self.category_name
 
 
 class Project(models.Model):
@@ -33,6 +39,9 @@ class Project(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='projects')
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='owner')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.project_name
 
 
     def get_tasks_count(self):
@@ -51,6 +60,9 @@ class Project(models.Model):
 
 class Tag(models.Model):
     tag_name = models.CharField(30, unique=True)
+
+    def __str__(self):
+        return self.tag_name
 
 
 class Task(models.Model):
@@ -109,6 +121,9 @@ class TaskFile(models.Model):
     task = models.ForeignKey(Task, related_name='files', on_delete=models.CASCADE)
     image = models.FileField(upload_to='task_files/')
 
+    def __str__(self):
+        return self.task
+
 
 class Comment(models.Model):
     task = models.ForeignKey(Task, related_name='comments', on_delete=models.CASCADE)
@@ -116,10 +131,20 @@ class Comment(models.Model):
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Favorite(models.Model):
     user = models.OneToOneField(UserProfile, related_name="favorite", on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.user.username
+
+
 class FavoriteItem(models.Model):
     Favorite = models.ForeignKey(Favorite, related_name="items", on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.task.title
