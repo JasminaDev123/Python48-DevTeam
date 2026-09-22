@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
 from django.db import models
+from django.utils import timezone
 
 
 
@@ -50,5 +51,57 @@ class Project(models.Model):
 
 class Tag(models.Model):
     tag_name = models.CharField(30, unique=True)
+
+
+class Task(models.Model):
+    PRIORITY_CHOICES = [
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+    ]
+
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    completed = models.BooleanField(default=False)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="medium",)
+    deadline = models.DateTimeField(null=True, blank=True,)
+    created_date = models.DateTimeField(auto_now_add=True)
+    project = models.ForeignKey("Project", related_name="tasks", on_delete=models.CASCADE,)
+    assignee = models.ForeignKey("UserProfile", null=True, blank=True, on_delete=models.SET_NULL,)
+    tags = models.ManyToManyField("Tag", blank=True,)
+
+    def get_progress(self):
+        total = self.subtasks.count()
+
+        if total == 0:
+            return 0
+
+        completed = self.subtasks.filter(completed=True).count()
+
+        return int(completed / total * 100)
+
+    def get_comments_count(self):
+        return self.comments.count()
+
+    def is_overdue(self):
+        if self.completed:
+            return False
+
+        if self.deadline is None:
+            return False
+
+        return timezone.now() > self.deadline
+
+    def __str__(self):
+        return self.title
+
+
+class Subtask(models.Model):
+    task = models.ForeignKey(Task, related_name="subtasks", on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
 
 
