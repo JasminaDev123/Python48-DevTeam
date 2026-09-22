@@ -18,7 +18,7 @@ class UserProfile(AbstractUser):
     age = models.PositiveIntegerField(validators=[MinValueValidator(18), MaxValueValidator(70)], null=True, blank=True)
     phone_number = PhoneNumberField(default='+996')
     avatar = models.ImageField(upload_to='UserImage', null=True, blank=True)
-    status = models.CharField(max_length=10, choises=USER_STATUS, default='beginner')
+    status = models.CharField(max_length=10, choices=USER_STATUS, default='beginner')
     data_register = models.DateField(auto_now_add=True)
 
 
